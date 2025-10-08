@@ -4,19 +4,26 @@
   --stage-h: 450px;
 
   /* Logical sprite pixels are scaled by this factor */
-  --pixel-size: 4;
+  --pixel-size: 8;
 
   /* Colors */
-  --bg1: #0b0f16;
-  --bg2: #141b21;
+  --bg1: #102a1b;
+  --bg2: #081d12;
+
+  /* Classic Game Boy-inspired 4 tone palette */
+  --gb-darkest: #0f380f;
+  --gb-dark: #2e5d2c;
+  --gb-light: #6a8f2a;
+  --gb-lightest: #9bbc0f;
 
   /* Player palette (override any time) */
-  --c-skin:#f1c29c;
-  --c-hair:#3a2a23;
-  --c-shirt:#2bb673;
-  --c-shirt-shadow:#208a58;
-  --c-pants:#1f2b38;
-  --c-eye:#1b1b1b;
+  --c-skin: var(--gb-lightest);
+  --c-hair: var(--gb-darkest);
+  --c-shirt: var(--gb-light);
+  --c-shirt-shadow: var(--gb-dark);
+  --c-pants: var(--gb-darkest);
+  --c-eye: var(--gb-darkest);
+  --c-outline: rgba(15, 56, 15, 0.35);
 
   /* World */
   --world-w: 2000px;  /* world is larger than the stage */
@@ -81,6 +88,15 @@ body {
   transform: translateZ(0) scale(var(--pixel-size));
   transform-origin: top left;
   image-rendering: pixelated;
+}
+
+.sprite.person{
+  /* Build a subtle 4-direction outline reminiscent of DMG sprites */
+  filter:
+    drop-shadow(0 1px 0 var(--c-outline))
+    drop-shadow(0 -1px 0 var(--c-outline))
+    drop-shadow(1px 0 0 var(--c-outline))
+    drop-shadow(-1px 0 0 var(--c-outline));
 }
 
 /* We flip left/right by scaling X */
