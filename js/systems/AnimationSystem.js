@@ -20,12 +20,10 @@ export class AnimationSystem extends System {
       if(moving){ root.classList.add('state--walk'); root.classList.remove('state--idle'); }
       else { root.classList.add('state--idle'); root.classList.remove('state--walk'); }
 
-      // Flip horizontally based on motion X
       const spriteEl = s.dom;
-      if(Math.abs(m.vx) > 0.01){
-        if(m.vx < 0) spriteEl.classList.add('flip-x');
-        else spriteEl.classList.remove('flip-x');
-      }
+      const dir = m.dir || 'down';
+      spriteEl.dataset.dir = dir;
+      spriteEl.classList.toggle('flip-x', dir === 'right');
     }
   }
 }

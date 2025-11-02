@@ -73,33 +73,7 @@ export class Game {
   buildPersonSprite(){
     const root = document.createElement('div');
     root.className = 'sprite person';
-
-    // Head
-    const head = document.createElement('div');
-    head.className = 'head layer-head';
-    const headPixels = ['p0','p1','p2','p3','p4','p5','p6','p7','p8','p9','eye-l','eye-r','p10','p11','p12'];
-    for(const cls of headPixels){ const p = document.createElement('div'); p.className = `pixel ${cls}`; head.appendChild(p); }
-    root.appendChild(head);
-
-    // Body
-    const body = document.createElement('div');
-    body.className = 'body layer-body';
-    for(let i=0;i<30;i++){
-      const b = document.createElement('div');
-      b.className = 'pixel b'+i;
-      // shadow on the right column already handled by CSS selector, but leave class if needed
-      if([5,11,17,23,29].includes(i)) b.classList.add('shadow');
-      body.appendChild(b);
-    }
-    root.appendChild(body);
-
-    // Legs
-    const legs = document.createElement('div');
-    legs.className = 'legs layer-legs';
-    const legClasses = ['l0','l1','l2','l3','l4','r0','r1','r2','r3','r4'];
-    for(const cls of legClasses){ const l = document.createElement('div'); l.className = `pixel ${cls}`; legs.appendChild(l); }
-    root.appendChild(legs);
-
+    root.dataset.dir = 'down';
     return root;
   }
 
