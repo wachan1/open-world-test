@@ -68,6 +68,16 @@ export class MovementSystem extends System {
       m.vx = newX - t.x;
       m.vy = newY - t.y;
 
+      const absX = Math.abs(m.vx);
+      const absY = Math.abs(m.vy);
+      if(absX > 0.01 || absY > 0.01){
+        if(absX > absY){
+          m.dir = m.vx >= 0 ? 'right' : 'left';
+        } else {
+          m.dir = m.vy >= 0 ? 'down' : 'up';
+        }
+      }
+
       t.x = newX;
       t.y = newY;
     }

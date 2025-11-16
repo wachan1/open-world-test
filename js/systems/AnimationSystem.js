@@ -3,8 +3,46 @@ import { MotionType } from '../components/Motion.js';
 import { SpriteType } from '../components/Sprite.js';
 import { TransformType } from '../components/Transform.js';
 
+const WALK_FRAME_DURATION = 0.14; // seconds per frame (~7 fps)
+
+const FRAME_DATA = {
+  down: {
+    idle: { x:102, y:61, w:221, h:280 },
+    walk: [
+      { x:123, y:341, w:201, h:341 },
+      { x:135, y:682, w:188, h:314 },
+    ],
+  },
+  up: {
+    idle: { x:396, y:61, w:229, h:280 },
+    walk: [
+      { x:413, y:341, w:196, h:341 },
+      { x:414, y:682, w:195, h:314 },
+    ],
+  },
+  right: {
+    idle: { x:696, y:61, w:203, h:280 },
+    walk: [
+      { x:695, y:341, w:204, h:341 },
+      { x:695, y:682, w:202, h:314 },
+    ],
+  },
+};
+
+function applyFrame(el, frame){
+  el.style.setProperty('--frame-w', `${frame.w}px`);
+  el.style.setProperty('--frame-h', `${frame.h}px`);
+  el.style.setProperty('--bg-x', `${frame.x}px`);
+  el.style.setProperty('--bg-y', `${frame.y}px`);
+}
+
 export class AnimationSystem extends System {
-  update(){
+  constructor(){
+    super();
+    this.walkState = new Map();
+  }
+
+  update(dt=0){
     const ents = this.world.query(MotionType, SpriteType, TransformType);
     for(const e of ents){
       const m = e.get(MotionType);
@@ -20,12 +58,36 @@ export class AnimationSystem extends System {
       if(moving){ root.classList.add('state--walk'); root.classList.remove('state--idle'); }
       else { root.classList.add('state--idle'); root.classList.remove('state--walk'); }
 
-      // Flip horizontally based on motion X
       const spriteEl = s.dom;
-      if(Math.abs(m.vx) > 0.01){
-        if(m.vx < 0) spriteEl.classList.add('flip-x');
-        else spriteEl.classList.remove('flip-x');
+      const dir = m.dir || 'down';
+      spriteEl.dataset.dir = dir;
+
+      const facing = dir === 'left' ? 'right' : dir;
+      const frames = FRAME_DATA[facing];
+      if(!frames) continue;
+
+      let state = this.walkState.get(e.id) || { t:0, idx:0, dir:null };
+      if(dir !== state.dir){
+        state = { t:0, idx:0, dir }; // reset when direction changes
       }
+
+      if(moving){
+        state.t += dt;
+        if(state.t >= WALK_FRAME_DURATION){
+          state.t = 0;
+          state.idx = (state.idx + 1) % frames.walk.length;
+        }
+      } else {
+        state.t = 0;
+        state.idx = 0;
+      }
+
+      const frame = moving ? frames.walk[state.idx] : frames.idle;
+      applyFrame(spriteEl, frame);
+      spriteEl.classList.toggle('flip-x', dir === 'left');
+
+      state.dir = dir;
+      this.walkState.set(e.id, state);
     }
   }
 }

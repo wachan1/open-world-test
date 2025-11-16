@@ -28,6 +28,8 @@
   /* World */
   --world-w: 2000px;  /* world is larger than the stage */
   --world-h: 1200px;
+
+  --player-scale: 0.2;
 }
 
 * { box-sizing: border-box; }
@@ -81,103 +83,38 @@ body {
   will-change: transform;
 }
 
-/* --- CSS-only 8-bit sprite --- */
+/* --- Sprite handling --- */
 .sprite{
   position:absolute;
-  width:16px; height:16px;            /* logical size */
-  transform: translateZ(0) scale(var(--pixel-size));
-  transform-origin: top left;
+  left: 0;
+  top: 0;
+  transform-origin: 50% 100%;
   image-rendering: pixelated;
+  background-repeat: no-repeat;
+  --sprite-scale: 1;
+  transform: translate(-50%, -100%) scale(var(--sprite-scale));
+}
+
+.sprite.flip-x{
+  transform: translate(-50%, -100%) scale(calc(var(--sprite-scale) * -1), var(--sprite-scale));
 }
 
 .sprite.person{
-  /* Build a subtle 4-direction outline reminiscent of DMG sprites */
+  --sprite-scale: var(--player-scale, 0.2);
+  --frame-w: 221px;
+  --frame-h: 280px;
+  --bg-x: 102px;
+  --bg-y: 61px;
+  width: var(--frame-w);
+  height: var(--frame-h);
+  background-image: url('../sprites/ChatGPT Image Nov 1, 2025, 11_37_03 PM.png');
+  background-size: 1024px 1024px;
+  background-position: calc(var(--bg-x) * -1) calc(var(--bg-y) * -1);
   filter:
     drop-shadow(0 1px 0 var(--c-outline))
     drop-shadow(0 -1px 0 var(--c-outline))
     drop-shadow(1px 0 0 var(--c-outline))
     drop-shadow(-1px 0 0 var(--c-outline));
-}
-
-/* We flip left/right by scaling X */
-.sprite.flip-x{ transform: translateZ(0) scale(calc(var(--pixel-size) * -1), var(--pixel-size)); }
-
-/* Build the person out of 1px squares */
-.pixel{ position:absolute; width:1px; height:1px; }
-
-/* Layers for convenience */
-.layer-head{ left:5px; top:1px; width:6px; height:5px; }
-.layer-body{ left:5px; top:6px; width:6px; height:5px; }
-.layer-legs{ left:6px; top:11px; width:4px; height:5px; }
-
-/* Simple placement (compact — not all pixels commented) */
-.person .head .p0,.person .head .p1,.person .head .p2,.person .head .p3,.person .head .p4{ top:0; background:var(--c-hair); }
-.person .head .p0{ left:0 } .person .head .p1{ left:1 } .person .head .p2{ left:2 } .person .head .p3{ left:3 } .person .head .p4{ left:4 }
-
-.person .head .p5{ left:0; top:1; background:var(--c-skin) }
-.person .head .p6{ left:1; top:1; background:var(--c-skin) }
-.person .head .p7{ left:2; top:1; background:var(--c-skin) }
-.person .head .p8{ left:3; top:1; background:var(--c-skin) }
-.person .head .p9{ left:4; top:1; background:var(--c-skin) }
-
-.person .head .eye-l{ left:1; top:2; background:var(--c-eye) }
-.person .head .eye-r{ left:3; top:2; background:var(--c-eye) }
-
-.person .head .p10{ left:1; top:3; background:var(--c-skin) }
-.person .head .p11{ left:2; top:3; background:var(--c-skin) }
-.person .head .p12{ left:3; top:3; background:var(--c-skin) }
-
-/* torso 6×5 with right-side shadow */
-.person .body .b0,.person .body .b1,.person .body .b2,.person .body .b3,.person .body .b4,.person .body .b5,
-.person .body .b6,.person .body .b7,.person .body .b8,.person .body .b9,.person .body .b10,.person .body .b11,
-.person .body .b12,.person .body .b13,.person .body .b14,.person .body .b15,.person .body .b16,.person .body .b17,
-.person .body .b18,.person .body .b19,.person .body .b20,.person .body .b21,.person .body .b22,.person .body .b23,
-.person .body .b24,.person .body .b25,.person .body .b26,.person .body .b27,.person .body .b28,.person .body .b29 { background:var(--c-shirt); }
-
-.person .body .shadow { background:var(--c-shirt-shadow); }
-.person .body .b5, .person .body .b11, .person .body .b17, .person .body .b23, .person .body .b29 { background:var(--c-shirt-shadow); }
-
-/* Pants/legs columns (simple 2-pixel “legs”) */
-.person .legs .l0,.person .legs .l1,.person .legs .l2,.person .legs .l3,.person .legs .l4,
-.person .legs .r0,.person .legs .r1,.person .legs .r2,.person .legs .r3,.person .legs .r4 { background:var(--c-pants) }
-
-.person .legs .l0{ left:0; top:0 } .person .legs .l1{ left:0; top:1 } .person .legs .l2{ left:0; top:2 } .person .legs .l3{ left:0; top:3 } .person .legs .l4{ left:0; top:4 }
-.person .legs .r0{ left:3; top:0 } .person .legs .r1{ left:3; top:1 } .person .legs .r2{ left:3; top:2 } .person .legs .r3{ left:3; top:3 } .person .legs .r4{ left:3; top:4 }
-
-/* ---------- Animations ---------- */
-
-/* Idle: gentle bob */
-@keyframes idle-bob {
-  0%,100% { transform: translateY(0) }
-  50% { transform: translateY(-0.5px) }
-}
-
-/* Walk: bob a bit more */
-@keyframes walk-bob {
-  0%,100% { transform: translateY(0) }
-  50% { transform: translateY(-1px) }
-}
-
-/* Leg swing by shifting the right/left leg columns vertically a touch */
-@keyframes leg-swing-left {
-  0%,100% { transform: translateY(0) }
-  50% { transform: translateY(1px) }
-}
-@keyframes leg-swing-right {
-  0%,100% { transform: translateY(0) }
-  50% { transform: translateY(-1px) }
-}
-
-/* State classes the AnimationSystem toggles */
-.state--idle .sprite { animation: idle-bob 700ms ease-in-out infinite; }
-.state--walk .sprite { animation: walk-bob 380ms ease-in-out infinite; }
-
-/* Leg group animations only when walking */
-.state--walk .legs .l0, .state--walk .legs .l1, .state--walk .legs .l2, .state--walk .legs .l3, .state--walk .legs .l4 {
-  animation: leg-swing-left 380ms ease-in-out infinite;
-}
-.state--walk .legs .r0, .state--walk .legs .r1, .state--walk .legs .r2, .state--walk .legs .r3, .state--walk .legs .r4 {
-  animation: leg-swing-right 380ms ease-in-out infinite;
 }
 
 /* --- Collidable obstacle visual --- */
