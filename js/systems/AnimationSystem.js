@@ -61,33 +61,7 @@ export class AnimationSystem extends System {
       const spriteEl = s.dom;
       const dir = m.dir || 'down';
       spriteEl.dataset.dir = dir;
-
-      const facing = dir === 'left' ? 'right' : dir;
-      const frames = FRAME_DATA[facing];
-      if(!frames) continue;
-
-      let state = this.walkState.get(e.id) || { t:0, idx:0, dir:null };
-      if(dir !== state.dir){
-        state = { t:0, idx:0, dir }; // reset when direction changes
-      }
-
-      if(moving){
-        state.t += dt;
-        if(state.t >= WALK_FRAME_DURATION){
-          state.t = 0;
-          state.idx = (state.idx + 1) % frames.walk.length;
-        }
-      } else {
-        state.t = 0;
-        state.idx = 0;
-      }
-
-      const frame = moving ? frames.walk[state.idx] : frames.idle;
-      applyFrame(spriteEl, frame);
-      spriteEl.classList.toggle('flip-x', dir === 'left');
-
-      state.dir = dir;
-      this.walkState.set(e.id, state);
+      spriteEl.classList.toggle('flip-x', dir === 'right');
     }
   }
 }

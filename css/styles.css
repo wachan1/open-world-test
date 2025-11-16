@@ -86,36 +86,44 @@ body {
 /* --- Sprite handling --- */
 .sprite{
   position:absolute;
-  left: 0;
-  top: 0;
-  transform-origin: 50% 100%;
+  transform-origin: top left;
   image-rendering: pixelated;
   background-repeat: no-repeat;
   --sprite-scale: 1;
-  transform: translate(-50%, -100%) scale(var(--sprite-scale));
+  transform: translateZ(0) scale(var(--sprite-scale));
 }
 
 .sprite.flip-x{
-  transform: translate(-50%, -100%) scale(calc(var(--sprite-scale) * -1), var(--sprite-scale));
+  transform: translateZ(0) scale(calc(var(--sprite-scale) * -1), var(--sprite-scale));
 }
 
 .sprite.person{
   --sprite-scale: var(--player-scale, 0.2);
-  --frame-w: 221px;
-  --frame-h: 280px;
-  --bg-x: 102px;
-  --bg-y: 61px;
-  width: var(--frame-w);
-  height: var(--frame-h);
+  width: calc(1024px / 3);
+  height: calc(1024px / 3);
   background-image: url('../sprites/ChatGPT Image Nov 1, 2025, 11_37_03 PM.png');
-  background-size: 1024px 1024px;
-  background-position: calc(var(--bg-x) * -1) calc(var(--bg-y) * -1);
+  background-size: 300% 300%;
+  --row-y: 0%;
+  background-position: 50% var(--row-y);
   filter:
     drop-shadow(0 1px 0 var(--c-outline))
     drop-shadow(0 -1px 0 var(--c-outline))
     drop-shadow(1px 0 0 var(--c-outline))
     drop-shadow(-1px 0 0 var(--c-outline));
 }
+
+.sprite.person[data-dir="down"]{ --row-y: 0%; }
+.sprite.person[data-dir="left"],
+.sprite.person[data-dir="right"]{ --row-y: 50%; }
+.sprite.person[data-dir="up"]{ --row-y: 100%; }
+
+@keyframes walk-row {
+  from { background-position: 0% var(--row-y); }
+  to { background-position: 100% var(--row-y); }
+}
+
+.state--idle .sprite.person{ animation: none; background-position: 50% var(--row-y); }
+.state--walk .sprite.person{ animation: walk-row 420ms steps(3) infinite; }
 
 /* --- Collidable obstacle visual --- */
 .obstacle{
